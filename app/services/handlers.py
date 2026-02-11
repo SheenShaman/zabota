@@ -63,7 +63,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_context = history_service.get(user_id)
         assistant_reply = await openai_service.get_response(user_context)
         history_service.add(user_id, "assistant", assistant_reply)
-        await update.message.reply_text(assistant_reply)
+        await update.message.reply_text(assistant_reply, parse_mode="HTML")
 
     except Exception as e:
         logging.error(f"Ошибка OpenAI: {e}")
