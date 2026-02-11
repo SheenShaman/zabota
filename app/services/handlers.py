@@ -3,8 +3,8 @@ import logging
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ContextTypes
 
-from app.history_service import History
-from app.client_openai import ClientOpenAI
+from app.services.history_service import History
+from app.services.client_openai import ClientOpenAI
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ async def start_handler(
     history_service.clear(user_id=update.effective_user.id)
     await update.message.reply_text(
         "Привет!\n"
-        "Я бот GPT, какой у тебя запрос?",
+        "Я AI бот, какой у тебя запрос?",
         reply_markup=keyboard
     )
 
@@ -49,6 +49,9 @@ async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Обработка текстовых запросов
+    """
     user_id = update.effective_user.id
     user_text = update.message.text
     if user_text == "Новый запрос":
@@ -65,5 +68,14 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logging.error(f"Ошибка OpenAI: {e}")
         await update.message.reply_text(
-            "Произошла ошибка при обращении к ChatGPT."
+            "Произошла ошибка при обращении к модели."
         )
+
+async def unknown_command_handler(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+    await update.message.reply_text(
+        "Неизвестная команда\n"
+        "Введите /help чтобы увидеть список доступных команд."
+    )

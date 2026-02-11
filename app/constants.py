@@ -4,4 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
+
+OPENROUTER_URL = "https://openrouter.ai/api/v1"
+AI_MODEL_ID = "mistralai/mistral-7b-instruct"
