@@ -1,12 +1,15 @@
 import logging
-from collections import defaultdict
 
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ContextTypes
 
+from app.history_service import History
+from app.client_openai import ClientOpenAI
+
 logger = logging.getLogger(__name__)
 
-user_histories = defaultdict(list)
+history_service = History()
+openai_service = ClientOpenAI()
 
 keyboard = ReplyKeyboardMarkup(
     [[KeyboardButton("Новый запрос")]],
@@ -14,23 +17,11 @@ keyboard = ReplyKeyboardMarkup(
 )
 
 
-def clear_user_history(user_id: int):
-    user_histories[user_id] = []
-    logger.info(f"clear_user_history: {user_id}")
-
-
-def add_history_query(user_id: int, role: str, role_content: str):
-    user_histories[user_id].append(
-        {"role": role, "content": role_content}
-    )
-    logger.info(f"add_user_history: {user_id}")
-
-
 async def start_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ):
-    clear_user_history(update.effective_user.id)
+    history_service.clear(user_id=update.effective_user.id)
     await update.message.reply_text(
         "Привет!\n"
         "Я бот GPT, какой у тебя запрос?",
@@ -42,7 +33,7 @@ async def new_query_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ):
-    clear_user_history(update.effective_user.id)
+    history_service.clear(user_id=update.effective_user.id)
     await update.message.reply_text(
         "Контекст сброшен\n"
         "Какой у тебя запрос?"
@@ -63,13 +54,16 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_text == "Новый запрос":
         await new_query_handler(update, context)
         return
-    else:
-        add_history_query(user_id, "user", user_text)
-        user_context: list = user_histories[user_id]
-        try:
-            assistant_reply = await openai_query(user_context)
-            add_history_query(user_id, "assistant", assistant_reply)
-        except Exception as e:
-            logging.error(f"Ошибка OpenAI: {e}")
-            await update.message.reply_text(
-                "Произошла ошибка при обращении к ChatGPT.")
+
+    history_service.add(user_id, "user", user_text)
+    try:
+        user_context = history_service.get(user_id)
+        assistant_reply = await openai_service.get_response(user_context)
+        history_service.add(user_id, "assistant", assistant_reply)
+        await update.message.reply_text(assistant_reply)
+
+    except Exception as e:
+        logging.error(f"Ошибка OpenAI: {e}")
+        await update.message.reply_text(
+            "Произошла ошибка при обращении к ChatGPT."
+        )

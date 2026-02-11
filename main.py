@@ -1,5 +1,4 @@
 import logging
-from app.logger import setup_logging
 
 from telegram.ext import (
     ApplicationBuilder,
@@ -9,6 +8,7 @@ from telegram.ext import (
 )
 
 from app.constants import TELEGRAM_TOKEN
+from app.logger import setup_logging
 from app.handlers import (
     start_handler,
     help_handler,
