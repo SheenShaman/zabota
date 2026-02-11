@@ -1,12 +1,12 @@
-# Telegram GPT Bot
+# Telegram AI Bot
 
-Telegram-бот на Python с интеграцией OpenAI API.
-Бот сохраняет контекст диалога и генерирует ответы с использованием ChatGPT.
+Telegram-бот на Python с интеграцией OpenRouter API.
+Бот сохраняет контекст диалога и генерирует ответы с использованием модели Ministral.
 
 ### Возможности
 
 - Ответ на команды /start, /help, /new_query
-- Генерация ответов через OpenAI API
+- Генерация ответов через OpenRouter API
 - Сохранение истории диалога для каждого пользователя
 
 Сброс контекста:
@@ -20,7 +20,7 @@ Telegram-бот на Python с интеграцией OpenAI API.
 - main.py — точка входа, регистрация handlers и запуск бота
 - handlers.py — обработчики команд и сообщений
 - history_service.py — хранение истории диалога
-- openai_service.py — взаимодействие с OpenAI API
+- client_openai.py — взаимодействие с OpenRouter API
 - constants.py — конфигурация (токены)
 - logger.py — настройка логирования
 
@@ -37,8 +37,8 @@ Telegram-бот на Python с интеграцией OpenAI API.
 
 Создать файл .env в корне проекта:
 `TELEGRAM_TOKEN=your_telegram_token`
-`OPENAI_API_KEY=your_openai_api_key`
+`OPENROUTER_API_KEY=your_openrouter_api_key`
 
 ### Запуск
 
-`python main.py`
+`python app/main.py`
