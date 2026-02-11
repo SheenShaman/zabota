@@ -65,3 +65,11 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     else:
         add_history_query(user_id, "user", user_text)
+        user_context: list = user_histories[user_id]
+        try:
+            assistant_reply = await openai_query(user_context)
+            add_history_query(user_id, "assistant", assistant_reply)
+        except Exception as e:
+            logging.error(f"Ошибка OpenAI: {e}")
+            await update.message.reply_text(
+                "Произошла ошибка при обращении к ChatGPT.")
